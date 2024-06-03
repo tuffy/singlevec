@@ -418,13 +418,13 @@ impl<T> FromIterator<T> for SingleVec<T> {
 
         let iter = iter.into_iter();
 
-        match iter.size_hint().1 {
-            None | Some(0 | 1) => {
+        match iter.size_hint().0 {
+            0 | 1 => {
                 let mut s = Self::default();
                 s.extend(iter);
                 s
             }
-            Some(_) => Self::Many(iter.collect()),
+            _ => Self::Many(iter.collect()),
         }
     }
 }
