@@ -6,5 +6,7 @@ version = "1.0.0"
 authors = ["Brian Langenberger <bjl@usa.net>"]
 license = "MIT/Apache-2.0"
 edition = "2021"
+homepage = "https://github.com/tuffy/singlevec"
+repository = "https://github.com/tuffy/singlevec"
 
 [dependencies]
