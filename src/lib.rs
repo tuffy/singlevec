@@ -152,6 +152,55 @@ impl<T> SingleVec<T> {
         }
     }
 
+    /// Maps a `SingleVec<T>` to a `SingleVec<U>`
+    /// by applying a conversion function to each element.
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from(["Hello"]);
+    /// assert_eq!(v.map(|s| s.len()), [5].into());
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from(["Hello", "World!"]);
+    /// assert_eq!(v.map(|s| s.len()), [5, 6].into());
+    /// ```
+    #[inline]
+    pub fn map<U>(self, f: impl FnMut(T) -> U) -> SingleVec<U> {
+        match self {
+            Self::One(o) => SingleVec::One(o.map(f)),
+            Self::Many(v) => SingleVec::Many(v.into_iter().map(f).collect()),
+        }
+    }
+
+    /// Combines both a filter and map into a single operation.
+    ///
+    /// The returned `SingleVec` contains only items for which
+    /// the supplied closure returns `Some(value)`.
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from(Some("5"));
+    /// assert_eq!(v.filter_map(|s| s.parse().ok()), [5].into());
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from(["1", "two", "NaN", "four", "5"]);
+    /// assert_eq!(v.filter_map(|s| s.parse().ok()), [1, 5].into());
+    /// ```
+    #[inline]
+    pub fn filter_map<U>(self, mut f: impl FnMut(T) -> Option<U>) -> SingleVec<U> {
+        match self {
+            Self::One(None) => SingleVec::One(None),
+            Self::One(Some(t)) => SingleVec::One(f(t)),
+            Self::Many(v) => v.into_iter().filter_map(f).collect(),
+        }
+    }
+
     /// Reduces `SingleVec` to a single item by repeatedly applying a reducing operation.
     ///
     /// The reducing function is a closure with two arguments:
@@ -242,29 +291,6 @@ impl<T> SingleVec<T> {
         match (self, other) {
             (Self::One(x), SingleVec::One(y)) => SingleVec::One(x.zip(y)),
             (i, j) => i.into_iter().zip(j).collect(),
-        }
-    }
-
-    /// Maps a `SingleVec<T>` to a `SingleVec<U>`
-    /// by applying a conversion function to each element.
-    ///
-    /// # Examples
-    /// ```
-    /// use singlevec::SingleVec;
-    /// let v = SingleVec::from(["Hello"]);
-    /// assert_eq!(v.map(|s| s.len()), [5].into());
-    /// ```
-    ///
-    /// ```
-    /// use singlevec::SingleVec;
-    /// let v = SingleVec::from(["Hello", "World!"]);
-    /// assert_eq!(v.map(|s| s.len()), [5, 6].into());
-    /// ```
-    #[inline]
-    pub fn map<U>(self, f: impl FnMut(T) -> U) -> SingleVec<U> {
-        match self {
-            Self::One(o) => SingleVec::One(o.map(f)),
-            Self::Many(v) => SingleVec::Many(v.into_iter().map(f).collect()),
         }
     }
 }
