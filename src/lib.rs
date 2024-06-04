@@ -413,19 +413,9 @@ impl<T> Extend<T> for SingleVec<T> {
 
 impl<T> FromIterator<T> for SingleVec<T> {
     fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
-        // if the iterator's size hint indicates more than one
-        // element is pending, jump directly to heap storage
-
-        let iter = iter.into_iter();
-
-        match iter.size_hint().0 {
-            0 | 1 => {
-                let mut s = Self::default();
-                s.extend(iter);
-                s
-            }
-            _ => Self::Many(iter.collect()),
-        }
+        let mut s = Self::default();
+        s.extend(iter);
+        s
     }
 }
 
