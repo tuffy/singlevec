@@ -42,7 +42,8 @@ impl<T> SingleVec<T> {
     ///
     /// # Example
     /// ```
-    /// let mut v = singlevec::SingleVec::default();
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::default();
     /// v.push(1);
     /// assert_eq!(v.as_slice(), &[1]);
     /// v.push(2);
@@ -80,13 +81,15 @@ impl<T> SingleVec<T> {
     ///
     /// # Examples
     /// ```
-    /// let mut v = singlevec::SingleVec::from([1, 2, 3]);
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1, 2, 3]);
     /// assert_eq!(v.pop(), Some(3));
     /// assert_eq!(v.as_slice(), &[1, 2]);
     /// ```
     ///
     /// ```
-    /// let mut v = singlevec::SingleVec::from([1]);
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1]);
     /// assert_eq!(v.pop(), Some(1));
     /// assert_eq!(v.pop(), None);
     /// assert!(v.is_empty());
@@ -121,7 +124,8 @@ impl<T> SingleVec<T> {
     ///
     /// # Example
     /// ```
-    /// let mut v = singlevec::SingleVec::from([1, 2, 3]);
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1, 2, 3]);
     /// v.clear();
     /// assert!(v.is_empty());
     /// ```
@@ -136,12 +140,14 @@ impl<T> SingleVec<T> {
     ///
     /// # Examples
     /// ```
-    /// let v = singlevec::SingleVec::from([0i32, 1, 2]);
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from([0i32, 1, 2]);
     /// assert_eq!(v.filter(|x| x.is_positive()).as_slice(), &[1, 2]);
     /// ```
     ///
     /// ```
-    /// let v = singlevec::SingleVec::from([0, 1, 2]);
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from([0, 1, 2]);
     /// assert_eq!(v.filter(|x| *x > 1).as_slice(), &[2]);
     /// ```
     #[inline]
@@ -215,17 +221,20 @@ impl<T> SingleVec<T> {
     /// # Examples
     ///
     /// ```
-    /// let v = singlevec::SingleVec::from([1, 2, 3]);
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from([1, 2, 3]);
     /// assert_eq!(v.reduce(|acc, x| acc + x), Some(6));
     /// ```
     ///
     /// ```
-    /// let v = singlevec::SingleVec::from([1]);
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::from([1]);
     /// assert_eq!(v.reduce(|acc, x| acc + x), Some(1));
     /// ```
     ///
     /// ```
-    /// let v = singlevec::SingleVec::default();
+    /// use singlevec::SingleVec;
+    /// let v = SingleVec::default();
     /// assert_eq!(v.reduce(|acc: i32, x| acc + x), None);
     /// ```
     #[inline]
