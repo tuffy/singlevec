@@ -305,7 +305,7 @@ impl<T> SingleVec<T> {
 
     /// Retains only the elements specified by the predicate.
     ///
-    /// Removes all elements e for which f(&e) returns `false`.
+    /// Removes all elements e for which `f(&e)` returns `false`.
     /// This method operates in place, visiting each element exactly
     /// once in the original order,
     /// and preserves the order of the retained elements.
@@ -340,7 +340,7 @@ impl<T> SingleVec<T> {
 
     /// Retains only the elements specified by the predicate, passing a mutable reference to it.
     ///
-    /// Removes all elements e such that f(&mut e) returns false.
+    /// Removes all elements e such that `f(&mut e)` returns `false`.
     /// This method operates in place, visiting each element exactly
     /// once in the original order,
     /// and preserves the order of the retained elements.
