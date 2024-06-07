@@ -302,6 +302,86 @@ impl<T> SingleVec<T> {
             (i, j) => i.into_iter().zip(j).collect(),
         }
     }
+
+    /// Retains only the elements specified by the predicate.
+    ///
+    /// Removes all elements e for which f(&e) returns `false`.
+    /// This method operates in place, visiting each element exactly
+    /// once in the original order,
+    /// and preserves the order of the retained elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1, 2, 3, 4]);
+    /// v.retain(|&x| x % 2 == 0);
+    /// assert_eq!(v.as_slice(), [2, 4]);
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1]);
+    /// v.retain(|&x| x % 2 == 0);
+    /// assert!(v.is_empty());
+    /// ```
+    #[inline]
+    pub fn retain(&mut self, mut f: impl FnMut(&T) -> bool) {
+        match self {
+            Self::One(o) => {
+                if let Some(x) = o.as_ref() {
+                    if !f(x) {
+                        *o = None;
+                    }
+                }
+            }
+            Self::Many(v) => v.retain(f),
+        }
+    }
+
+    /// Retains only the elements specified by the predicate, passing a mutable reference to it.
+    ///
+    /// Removes all elements e such that f(&mut e) returns false.
+    /// This method operates in place, visiting each element exactly
+    /// once in the original order,
+    /// and preserves the order of the retained elements.
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1, 2, 3, 4]);
+    /// v.retain_mut(|x| if *x <= 3 {
+    ///     *x *= 10;
+    ///     true
+    /// } else {
+    ///     false
+    /// });
+    /// assert_eq!(v.as_slice(), [10, 20, 30]);
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let mut v = SingleVec::from([1]);
+    /// v.retain_mut(|x| if *x <= 3 {
+    ///     *x *= 10;
+    ///     true
+    /// } else {
+    ///     false
+    /// });
+    /// assert_eq!(v.as_slice(), [10]);
+    /// ```
+    #[inline]
+    pub fn retain_mut(&mut self, mut f: impl FnMut(&mut T) -> bool) {
+        match self {
+            Self::One(o) => {
+                if let Some(x) = o.as_mut() {
+                    if !f(x) {
+                        *o = None;
+                    }
+                }
+            }
+            Self::Many(v) => v.retain_mut(f),
+        }
+    }
 }
 
 impl<T> SingleVec<Option<T>> {
