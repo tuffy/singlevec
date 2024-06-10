@@ -2,7 +2,7 @@
 name = "singlevec"
 description = "Vec-like container optimized for storing only a single item"
 keywords = ["data-structures", "no-std"]
-version = "1.2.0"
+version = "1.3.0"
 authors = ["Brian Langenberger <bjl@usa.net>"]
 license = "MIT/Apache-2.0"
 edition = "2021"
@@ -10,3 +10,8 @@ homepage = "https://github.com/tuffy/singlevec"
 repository = "https://github.com/tuffy/singlevec"
 
 [dependencies]
+serde = { version = "1.0", optional = true, default-features = false }
+
+[package.metadata.docs.rs]
+features = ["serde"]
+rustdoc-args = ["--cfg","docs_rs"]

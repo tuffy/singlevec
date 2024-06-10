@@ -18,9 +18,18 @@
 //! where appropriate.
 //! Since only a single optional item is intended to be the common case,
 //! those methods can avoid iteration altogether.
+//!
+//! ## Other Features
+//! * `serde` provides `Serialize` and `Deserialize` support,
+//! provided that the inner type also has the same implementation.
 
 #![warn(missing_docs)]
 #![forbid(unsafe_code)]
+
+#[cfg(feature = "serde")]
+use serde::de::{Deserialize, Deserializer, SeqAccess, Visitor};
+#[cfg(feature = "serde")]
+use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 /// A `Vec`-like type optimized for storing 0 or 1 items.
 #[derive(Clone, Debug)]
@@ -605,6 +614,58 @@ impl<T, const N: usize> From<[T; N]> for SingleVec<T> {
     #[inline]
     fn from(v: [T; N]) -> Self {
         v.into_iter().collect()
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg_attr(docs_rs, doc(cfg(feature = "serde")))]
+impl<T: Serialize> Serialize for SingleVec<T> {
+    #[must_use]
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        let mut seq = serializer.serialize_seq(Some(self.len()))?;
+        for element in self.iter() {
+            seq.serialize_element(element)?;
+        }
+        seq.end()
+    }
+}
+
+#[cfg(feature = "serde")]
+#[cfg_attr(docs_rs, doc(cfg(feature = "serde")))]
+impl<'de, T: Deserialize<'de>> Deserialize<'de> for SingleVec<T> {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(SingleVecVisitor(core::marker::PhantomData))
+    }
+}
+
+#[cfg(feature = "serde")]
+struct SingleVecVisitor<T>(core::marker::PhantomData<T>);
+
+#[cfg(feature = "serde")]
+impl<'de, T: Deserialize<'de>> Visitor<'de> for SingleVecVisitor<T> {
+    type Value = SingleVec<T>;
+
+    fn expecting(&self, formatter: &mut core::fmt::Formatter) -> core::fmt::Result {
+        formatter.write_str("a sequence")
+    }
+
+    fn visit_seq<S>(self, mut seq: S) -> Result<Self::Value, S::Error>
+    where
+        S: SeqAccess<'de>,
+    {
+        let mut v = SingleVec::default();
+
+        while let Some(value) = seq.next_element()? {
+            v.push(value);
+        }
+
+        Ok(v)
     }
 }
 
