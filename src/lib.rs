@@ -618,7 +618,6 @@ impl<T, const N: usize> From<[T; N]> for SingleVec<T> {
 }
 
 #[cfg(feature = "serde")]
-#[cfg_attr(docs_rs, doc(cfg(feature = "serde")))]
 impl<T: Serialize> Serialize for SingleVec<T> {
     #[must_use]
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -634,7 +633,6 @@ impl<T: Serialize> Serialize for SingleVec<T> {
 }
 
 #[cfg(feature = "serde")]
-#[cfg_attr(docs_rs, doc(cfg(feature = "serde")))]
 impl<'de, T: Deserialize<'de>> Deserialize<'de> for SingleVec<T> {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
