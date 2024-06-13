@@ -754,6 +754,351 @@ impl<I: Iterator, J: Iterator<Item = I::Item>> Iterator for EitherIterator<I, J>
             Self::J(j) => j.size_hint(),
         }
     }
+
+    #[inline]
+    fn count(self) -> usize
+    where
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.count(),
+            Self::J(j) => j.count(),
+        }
+    }
+
+    #[inline]
+    fn last(self) -> Option<Self::Item>
+    where
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.last(),
+            Self::J(j) => j.last(),
+        }
+    }
+
+    #[inline]
+    fn for_each<F>(self, f: F)
+    where
+        Self: Sized,
+        F: FnMut(Self::Item),
+    {
+        match self {
+            Self::I(i) => i.for_each(f),
+            Self::J(j) => j.for_each(f),
+        }
+    }
+
+    #[inline]
+    fn collect<B>(self) -> B
+    where
+        B: FromIterator<Self::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.collect(),
+            Self::J(j) => j.collect(),
+        }
+    }
+
+    #[inline]
+    fn partition<B, F>(self, f: F) -> (B, B)
+    where
+        Self: Sized,
+        B: Default + Extend<Self::Item>,
+        F: FnMut(&Self::Item) -> bool,
+    {
+        match self {
+            Self::I(i) => i.partition(f),
+            Self::J(j) => j.partition(f),
+        }
+    }
+
+    #[inline]
+    fn fold<B, F>(self, init: B, f: F) -> B
+    where
+        Self: Sized,
+        F: FnMut(B, Self::Item) -> B,
+    {
+        match self {
+            Self::I(i) => i.fold(init, f),
+            Self::J(j) => j.fold(init, f),
+        }
+    }
+
+    #[inline]
+    fn reduce<F>(self, f: F) -> Option<Self::Item>
+    where
+        Self: Sized,
+        F: FnMut(Self::Item, Self::Item) -> Self::Item,
+    {
+        match self {
+            Self::I(i) => i.reduce(f),
+            Self::J(j) => j.reduce(f),
+        }
+    }
+
+    #[inline]
+    fn all<F>(&mut self, f: F) -> bool
+    where
+        Self: Sized,
+        F: FnMut(Self::Item) -> bool,
+    {
+        match self {
+            Self::I(i) => i.all(f),
+            Self::J(j) => j.all(f),
+        }
+    }
+
+    #[inline]
+    fn any<F>(&mut self, f: F) -> bool
+    where
+        Self: Sized,
+        F: FnMut(Self::Item) -> bool,
+    {
+        match self {
+            Self::I(i) => i.any(f),
+            Self::J(j) => j.any(f),
+        }
+    }
+
+    #[inline]
+    fn find<P>(&mut self, predicate: P) -> Option<Self::Item>
+    where
+        Self: Sized,
+        P: FnMut(&Self::Item) -> bool,
+    {
+        match self {
+            Self::I(i) => i.find(predicate),
+            Self::J(j) => j.find(predicate),
+        }
+    }
+
+    #[inline]
+    fn find_map<B, F>(&mut self, f: F) -> Option<B>
+    where
+        Self: Sized,
+        F: FnMut(Self::Item) -> Option<B>,
+    {
+        match self {
+            Self::I(i) => i.find_map(f),
+            Self::J(j) => j.find_map(f),
+        }
+    }
+
+    #[inline]
+    fn position<P>(&mut self, predicate: P) -> Option<usize>
+    where
+        Self: Sized,
+        P: FnMut(Self::Item) -> bool,
+    {
+        match self {
+            Self::I(i) => i.position(predicate),
+            Self::J(j) => j.position(predicate),
+        }
+    }
+
+    #[inline]
+    fn max(self) -> Option<Self::Item>
+    where
+        Self: Sized,
+        Self::Item: Ord,
+    {
+        match self {
+            Self::I(i) => i.max(),
+            Self::J(j) => j.max(),
+        }
+    }
+
+    #[inline]
+    fn min(self) -> Option<Self::Item>
+    where
+        Self: Sized,
+        Self::Item: Ord,
+    {
+        match self {
+            Self::I(i) => i.min(),
+            Self::J(j) => j.min(),
+        }
+    }
+
+    #[inline]
+    fn max_by_key<B, F>(self, f: F) -> Option<Self::Item>
+    where
+        B: Ord,
+        Self: Sized,
+        F: FnMut(&Self::Item) -> B,
+    {
+        match self {
+            Self::I(i) => i.max_by_key(f),
+            Self::J(j) => j.max_by_key(f),
+        }
+    }
+
+    #[inline]
+    fn max_by<F>(self, compare: F) -> Option<Self::Item>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Item, &Self::Item) -> core::cmp::Ordering,
+    {
+        match self {
+            Self::I(i) => i.max_by(compare),
+            Self::J(j) => j.max_by(compare),
+        }
+    }
+
+    #[inline]
+    fn min_by_key<B, F>(self, f: F) -> Option<Self::Item>
+    where
+        B: Ord,
+        Self: Sized,
+        F: FnMut(&Self::Item) -> B,
+    {
+        match self {
+            Self::I(i) => i.min_by_key(f),
+            Self::J(j) => j.min_by_key(f),
+        }
+    }
+
+    #[inline]
+    fn min_by<F>(self, compare: F) -> Option<Self::Item>
+    where
+        Self: Sized,
+        F: FnMut(&Self::Item, &Self::Item) -> core::cmp::Ordering,
+    {
+        match self {
+            Self::I(i) => i.min_by(compare),
+            Self::J(j) => j.min_by(compare),
+        }
+    }
+
+    #[inline]
+    fn sum<S>(self) -> S
+    where
+        Self: Sized,
+        S: core::iter::Sum<Self::Item>,
+    {
+        match self {
+            Self::I(i) => i.sum(),
+            Self::J(j) => j.sum(),
+        }
+    }
+
+    #[inline]
+    fn product<P>(self) -> P
+    where
+        Self: Sized,
+        P: core::iter::Product<Self::Item>,
+    {
+        match self {
+            Self::I(i) => i.product(),
+            Self::J(j) => j.product(),
+        }
+    }
+
+    #[inline]
+    fn cmp<K>(self, other: K) -> core::cmp::Ordering
+    where
+        K: IntoIterator<Item = Self::Item>,
+        Self::Item: core::cmp::Ord,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.cmp(other),
+            Self::J(j) => j.cmp(other),
+        }
+    }
+
+    #[inline]
+    fn partial_cmp<K>(self, other: K) -> Option<core::cmp::Ordering>
+    where
+        K: IntoIterator,
+        Self::Item: PartialOrd<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.partial_cmp(other),
+            Self::J(j) => j.partial_cmp(other),
+        }
+    }
+
+    #[inline]
+    fn eq<K>(self, other: K) -> bool
+    where
+        K: IntoIterator,
+        Self::Item: PartialEq<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.eq(other),
+            Self::J(j) => j.eq(other),
+        }
+    }
+
+    #[inline]
+    fn ne<K>(self, other: K) -> bool
+    where
+        K: IntoIterator,
+        Self::Item: PartialEq<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.ne(other),
+            Self::J(j) => j.ne(other),
+        }
+    }
+
+    #[inline]
+    fn lt<K>(self, other: K) -> bool
+    where
+        K: IntoIterator,
+        Self::Item: PartialOrd<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.lt(other),
+            Self::J(j) => j.lt(other),
+        }
+    }
+
+    #[inline]
+    fn le<K>(self, other: K) -> bool
+    where
+        K: IntoIterator,
+        Self::Item: PartialOrd<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.le(other),
+            Self::J(j) => j.le(other),
+        }
+    }
+
+    #[inline]
+    fn gt<K>(self, other: K) -> bool
+    where
+        K: IntoIterator,
+        Self::Item: PartialOrd<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.gt(other),
+            Self::J(j) => j.gt(other),
+        }
+    }
+
+    #[inline]
+    fn ge<K>(self, other: K) -> bool
+    where
+        K: IntoIterator,
+        Self::Item: PartialOrd<<K as IntoIterator>::Item>,
+        Self: Sized,
+    {
+        match self {
+            Self::I(i) => i.ge(other),
+            Self::J(j) => j.ge(other),
+        }
+    }
 }
 
 impl<I: DoubleEndedIterator, J: DoubleEndedIterator<Item = I::Item>> DoubleEndedIterator
