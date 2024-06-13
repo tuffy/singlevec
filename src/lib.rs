@@ -728,6 +728,7 @@ mod tests {
 /// Checks the iterator variant on each iteration,
 /// but the expectation is that the iterator length
 /// will usually be very short.
+#[derive(Clone, Debug)]
 pub enum EitherIterator<I, J> {
     /// The first iterator variant
     I(I),
@@ -769,5 +770,10 @@ impl<I: DoubleEndedIterator, J: DoubleEndedIterator<Item = I::Item>> DoubleEnded
 
 impl<I: ExactSizeIterator, J: ExactSizeIterator<Item = I::Item>> ExactSizeIterator
     for EitherIterator<I, J>
+{
+}
+
+impl<I: core::iter::FusedIterator, J: core::iter::FusedIterator<Item = I::Item>>
+    core::iter::FusedIterator for EitherIterator<I, J>
 {
 }
