@@ -337,10 +337,8 @@ impl<T> SingleVec<T> {
     pub fn retain(&mut self, mut f: impl FnMut(&T) -> bool) {
         match self {
             Self::One(o) => {
-                if let Some(x) = o.as_ref() {
-                    if !f(x) {
-                        *o = None;
-                    }
+                if o.as_ref().is_some_and(|x| !f(x)) {
+                    *o = None;
                 }
             }
             Self::Many(v) => v.retain(f),
@@ -382,10 +380,8 @@ impl<T> SingleVec<T> {
     pub fn retain_mut(&mut self, mut f: impl FnMut(&mut T) -> bool) {
         match self {
             Self::One(o) => {
-                if let Some(x) = o.as_mut() {
-                    if !f(x) {
-                        *o = None;
-                    }
+                if o.as_mut().is_some_and(|x| !f(x)) {
+                    *o = None;
                 }
             }
             Self::Many(v) => v.retain_mut(f),
