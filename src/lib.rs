@@ -21,7 +21,7 @@
 //!
 //! ## Other Features
 //! * `serde` provides `Serialize` and `Deserialize` support,
-//! provided that the inner type also has the same implementation.
+//!   provided that the inner type also has the same implementation.
 
 #![warn(missing_docs)]
 #![forbid(unsafe_code)]
@@ -434,6 +434,37 @@ impl<T> SingleVec<SingleVec<T>> {
         match self {
             Self::One(None) => SingleVec::One(None),
             Self::One(Some(inner)) => inner,
+            Self::Many(v) => v.into_iter().flatten().collect(),
+        }
+    }
+}
+
+impl<T> SingleVec<Vec<T>> {
+    /// Removes exactly one level of nesting from a `SingleVec`
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v: SingleVec<Vec<i32>> = [vec![1], vec![2], vec![]].into();
+    /// assert_eq!(v.flatten().as_slice(), &[1, 2]);
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v: SingleVec<Vec<i32>> = [vec![1, 2, 3]].into();
+    /// assert_eq!(v.flatten().as_slice(), &[1, 2, 3]);
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    /// let v: SingleVec<Vec<i32>> = [vec![1]].into();
+    /// assert_eq!(v.flatten().as_slice(), &[1]);
+    /// ```
+    #[inline]
+    pub fn flatten(self) -> SingleVec<T> {
+        match self {
+            Self::One(None) => SingleVec::One(None),
+            Self::One(Some(inner)) => SingleVec::Many(inner),
             Self::Many(v) => v.into_iter().flatten().collect(),
         }
     }
