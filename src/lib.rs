@@ -430,6 +430,7 @@ impl<T> SingleVec<Option<T>> {
     /// let input: SingleVec<Option<char>> = SingleVec::from([Some('a'), None]);
     /// assert!(input.transpose().is_none());
     /// ```
+    #[inline]
     pub fn transpose(self) -> Option<SingleVec<T>> {
         match self {
             Self::One(None) => None,
