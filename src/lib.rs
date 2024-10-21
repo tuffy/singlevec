@@ -412,6 +412,31 @@ impl<T> SingleVec<Option<T>> {
             Self::Many(v) => v.into_iter().flatten().collect(),
         }
     }
+
+    /// Transposes a `SingleVec` of `Option` into a `Option` of `SingleVec`.
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    ///
+    /// let input: SingleVec<Option<i32>> = SingleVec::from([Some(1)]);
+    /// let output: Option<SingleVec<i32>> = Some(SingleVec::from([1]));
+    /// assert_eq!(input.transpose(), output);
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    ///
+    /// let input: SingleVec<Option<char>> = SingleVec::from([Some('a'), None]);
+    /// assert!(input.transpose().is_none());
+    /// ```
+    pub fn transpose(self) -> Option<SingleVec<T>> {
+        match self {
+            Self::One(None) => None,
+            Self::One(Some(inner)) => Some(SingleVec::One(inner)),
+            Self::Many(v) => v.into_iter().collect::<Option<_>>().map(SingleVec::Many),
+        }
+    }
 }
 
 impl<T> SingleVec<SingleVec<T>> {
@@ -491,6 +516,41 @@ impl<T, U> SingleVec<(T, U)> {
             Self::One(None) => (SingleVec::One(None), SingleVec::One(None)),
             Self::One(Some((t, u))) => (SingleVec::One(Some(t)), SingleVec::One(Some(u))),
             Self::Many(v) => v.into_iter().unzip(),
+        }
+    }
+}
+
+impl<T, E> SingleVec<Result<T, E>> {
+    /// Transposes a `SingleVec` of `Result` into a `Result` of `SingleVec`,
+    /// using the first error encoutered, if any.
+    ///
+    /// # Examples
+    /// ```
+    /// use singlevec::SingleVec;
+    ///
+    /// #[derive(Debug, Eq, PartialEq)]
+    /// struct SomeErr;
+    ///
+    /// let input: SingleVec<Result<i32, SomeErr>> = SingleVec::from([Ok(1)]);
+    /// let output: Result<SingleVec<i32>, SomeErr> = Ok(SingleVec::from([1]));
+    /// assert_eq!(input.transpose(), output);
+    /// ```
+    ///
+    /// ```
+    /// use singlevec::SingleVec;
+    ///
+    /// #[derive(Debug, Eq, PartialEq)]
+    /// struct SomeErr(i32);
+    ///
+    /// let input: SingleVec<Result<char, SomeErr>> = SingleVec::from([Ok('a'), Err(SomeErr(2)), Err(SomeErr(3))]);
+    /// let output: Result<SingleVec<char>, SomeErr> = Err(SomeErr(2));
+    /// assert_eq!(input.transpose(), output);
+    /// ```
+    #[inline]
+    pub fn transpose(self) -> Result<SingleVec<T>, E> {
+        match self {
+            Self::One(o) => o.transpose().map(SingleVec::One),
+            Self::Many(v) => v.into_iter().collect::<Result<_, _>>().map(SingleVec::Many),
         }
     }
 }
