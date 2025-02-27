@@ -111,6 +111,60 @@ impl<T> SingleVec<T> {
         }
     }
 
+    /// Inserts an element at position index within the vector, shifting all elements after it to the right.
+    /// # Panics
+    ///
+    /// Panics if `index > len`.
+    pub fn insert(&mut self, index: usize, e: T) {
+        match self {
+            Self::One(None) if index == 0 => {
+                *self = Self::One(Some(e));
+            }
+            Self::One(None) => panic!("insertion index (is {index}) should be <= len (is 0)"),
+            Self::One(Some(_)) => {
+                match index {
+                    0 => {
+                        let Some(o) = self.pop() else { unreachable!(); };
+                        let mut v = Vec::new();
+                        v.push(e);
+                        v.push(o);
+                        *self = Self::Many(v);
+                    }
+                    1 => {
+                        let Some(o) = self.pop() else { unreachable!(); };
+                        let mut v = Vec::new();
+                        v.push(o);
+                        v.push(e);
+                        *self = Self::Many(v);
+                    }
+                    _ => panic!("insertion index (is {index}) should be <= len (is 1)"),
+                }
+            }
+            Self::Many(v) => v.insert(index, e),
+        }
+    }
+
+    /// Removes and returns the element at position `index` within the vector,
+    /// shifting all elements after it to the left.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `index` is out of bounds.
+    pub fn remove(&mut self, index: usize) -> T {
+        match self {
+            Self::One(None) => panic!("removal index (is {index}) should be < len (is 0)"),
+            Self::One(Some(_)) if index == 0 => {
+                let Some(o) = self.pop() else { unreachable!(); };
+                *self = Self::One(None);
+                o
+            }
+            Self::One(Some(_)) => {
+                panic!("removal index (is {index}) should be < len (is 1)");
+            }
+            Self::Many(v) => v.remove(index),
+        }
+    }
+
     /// Extracts a slice containing the entire `SingleVec`.
     #[inline]
     pub fn as_slice(&self) -> &[T] {
@@ -807,6 +861,26 @@ mod tests {
         let mut h = std::collections::HashSet::new();
         h.insert(SingleVec::One(Some(1)));
         assert!(h.contains(&SingleVec::Many(vec![1])));
+    }
+
+    #[test]
+    fn insert_test() {
+        let mut v = SingleVec::new();
+        v.insert(0, 2);
+        v.insert(0, 1);
+        v.insert(2, 3);
+
+        assert_eq!(v[0], 1);
+        assert_eq!(v[1], 2);
+        assert_eq!(v[2], 3);
+    }
+
+    #[test]
+    fn remove_test() {
+        let mut v = SingleVec::from([1, 2, 3]);
+        assert_eq!(v.remove(0), 1);
+        assert_eq!(v.remove(0), 2);
+        assert_eq!(v.remove(0), 3);
     }
 }
 
