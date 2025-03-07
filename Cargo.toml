@@ -2,7 +2,7 @@
 name = "singlevec"
 description = "Vec-like container optimized for storing only a single item"
 keywords = ["data-structures", "no-std"]
-version = "1.7.0"
+version = "1.8.0"
 authors = ["Brian Langenberger <bjl@usa.net>"]
 license = "MIT/Apache-2.0"
 edition = "2021"

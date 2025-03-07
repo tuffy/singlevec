@@ -121,25 +121,27 @@ impl<T> SingleVec<T> {
                 *self = Self::One(Some(e));
             }
             Self::One(None) => panic!("insertion index (is {index}) should be <= len (is 0)"),
-            Self::One(Some(_)) => {
-                match index {
-                    0 => {
-                        let Some(o) = self.pop() else { unreachable!(); };
-                        let mut v = Vec::new();
-                        v.push(e);
-                        v.push(o);
-                        *self = Self::Many(v);
-                    }
-                    1 => {
-                        let Some(o) = self.pop() else { unreachable!(); };
-                        let mut v = Vec::new();
-                        v.push(o);
-                        v.push(e);
-                        *self = Self::Many(v);
-                    }
-                    _ => panic!("insertion index (is {index}) should be <= len (is 1)"),
+            Self::One(Some(_)) => match index {
+                0 => {
+                    let Some(o) = self.pop() else {
+                        unreachable!();
+                    };
+                    let mut v = Vec::new();
+                    v.push(e);
+                    v.push(o);
+                    *self = Self::Many(v);
                 }
-            }
+                1 => {
+                    let Some(o) = self.pop() else {
+                        unreachable!();
+                    };
+                    let mut v = Vec::new();
+                    v.push(o);
+                    v.push(e);
+                    *self = Self::Many(v);
+                }
+                _ => panic!("insertion index (is {index}) should be <= len (is 1)"),
+            },
             Self::Many(v) => v.insert(index, e),
         }
     }
@@ -154,7 +156,9 @@ impl<T> SingleVec<T> {
         match self {
             Self::One(None) => panic!("removal index (is {index}) should be < len (is 0)"),
             Self::One(Some(_)) if index == 0 => {
-                let Some(o) = self.pop() else { unreachable!(); };
+                let Some(o) = self.pop() else {
+                    unreachable!();
+                };
                 *self = Self::One(None);
                 o
             }
@@ -180,6 +184,24 @@ impl<T> SingleVec<T> {
         match self {
             Self::One(o) => o.as_mut_slice(),
             Self::Many(v) => v.as_mut_slice(),
+        }
+    }
+
+    /// Converts from `&SingleVec<T>` to `SingleVec<&T>`
+    #[inline]
+    pub fn as_ref(&self) -> SingleVec<&T> {
+        match self {
+            Self::One(o) => SingleVec::One(o.as_ref()),
+            Self::Many(v) => SingleVec::Many(v.iter().collect()),
+        }
+    }
+
+    /// Converts from `&mut SingleVec<T>` to `SingleVec<&mut T>`
+    #[inline]
+    pub fn as_mut(&mut self) -> SingleVec<&mut T> {
+        match self {
+            Self::One(o) => SingleVec::One(o.as_mut()),
+            Self::Many(v) => SingleVec::Many(v.iter_mut().collect()),
         }
     }
 
